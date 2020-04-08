@@ -11,22 +11,35 @@ import {
   BackHandler,
   Alert,
 } from "react-native";
+import { secondsToHms } from "../helpers/timeConverter.js";
 
-export default function Home({ route, navigation }) {
+export default function Home({ route, navigation, leaderBoard }) {
+  const dummy = [
+    {name: "a", score: "1", time: "1", level: "a"},
+    {name: "b", score: "2", time: "2", level: "b"},
+    {name: "c", score: "3", time: "3", level: "c"},
+    {name: "d", score: "4", time: "4", level: "d"},
+    {name: "e", score: "5", time: "5", level: "e"},
+    {name: "a", score: "1", time: "1", level: "a"},
+    {name: "b", score: "2", time: "2", level: "b"},
+    {name: "c", score: "3", time: "3", level: "c"},
+    {name: "d", score: "4", time: "4", level: "d"},
+    {name: "e", score: "5", time: "5", level: "e"},
+  ];
   BackHandler.addEventListener("hardwareBackPress",() => true);
   const exit = () => {
     confirm("EXIT APP?", "Exit from Sudo-Kyu?",() => BackHandler.exitApp());
   }
 
   const [name, setName] = useState("");
-  const getName = useCallback(async () => {
-    setName(await AsyncStorage.getItem("name"));
-  });
+  // const getName = useCallback(async () => {
+  //   setName(await AsyncStorage.getItem("name"));
+  // });
   useEffect(() => {
-    getName();
+    // getName();
   }, []);
   const gotoHome = async () => {
-    await AsyncStorage.removeItem("name");
+    await AsyncStorage.removeItem("player");
     navigation.navigate("Home");
   };
   const confirm = (title, message, action) => {
@@ -37,7 +50,7 @@ export default function Home({ route, navigation }) {
   };
   return (
     <KeyboardAvoidingView style={styles.containerHome}>
-      <ScrollView>
+      <View>
         {(!name && (
           <>
             <Text style={[styles.text, styles.loadingText]}>Loading</Text>
@@ -45,36 +58,63 @@ export default function Home({ route, navigation }) {
           </>
         )) || (
           <>
-            <Text style={[styles.text, styles.title]}>FINISHED!</Text>
-            <View style={[styles.marBot]}>
-              <Text style={[styles.textSummary, styles.textLeft]}>Name:</Text>
-              <Text
-                style={[styles.textSummary, styles.textRight, styles.textBold]}
-              >
-                {name}
-              </Text>
-              <Text style={[styles.textSummary, styles.textLeft]}>Score:</Text>
-              <Text
-                style={[styles.textSummary, styles.textRight, styles.textBold]}
-              >
-                100
-              </Text>
-              <Text style={[styles.textSummary, styles.textLeft]}>Time:</Text>
-              <Text
-                style={[styles.textSummary, styles.textRight, styles.textBold]}
-              >
-                02:55
-              </Text>
-              <Text style={[styles.textSummary, styles.textLeft]}>Level:</Text>
-              <Text
-                style={[styles.textSummary, styles.textRight, styles.textBold]}
-              >
-                {route.params.level}
-              </Text>
-            </View>
+            {/* <>
+              <Text style={[styles.text, styles.title]}>FINISHED!</Text>
+              <View style={[styles.marBot]}>
+                <Text style={[styles.textSummary, styles.textLeft]}>Name:</Text>
+                <Text
+                  style={[styles.textSummary, styles.textRight, styles.textBold]}
+                >
+                  {name}
+                </Text>
+                <Text style={[styles.textSummary, styles.textLeft]}>Score:</Text>
+                <Text
+                  style={[styles.textSummary, styles.textRight, styles.textBold]}
+                >
+                  100
+                </Text>
+                <Text style={[styles.textSummary, styles.textLeft]}>Time:</Text>
+                <Text
+                  style={[styles.textSummary, styles.textRight, styles.textBold]}
+                >
+                  {secondsToHms(route.params.time)}
+                </Text>
+                <Text style={[styles.textSummary, styles.textLeft]}>Level:</Text>
+                <Text
+                  style={[styles.textSummary, styles.textRight, styles.textBold]}
+                >
+                  {route.params.level}
+                </Text>
+              </View>
+            </> */}
+            <>
+              <>
+                <Text style={[styles.text, styles.title]}>LEADERBOARD</Text>
+                <View style={styles.fixToText}>
+                  <Text style={[styles.text, styles.textBold]}>Name</Text>
+                  <Text style={[styles.text, styles.textBold]}>Score</Text>
+                  <Text style={[styles.text, styles.textBold]}>Time</Text>
+                  <Text style={[styles.text, styles.textBold]}>Level</Text>
+                </View>
+                <ScrollView>
+                  {
+                    leaderBoard.map((data, idx) => {
+                      return(
+                        <View key={idx} style={styles.fixToText}>
+                          <Text style={styles.text}>{data.name}</Text>
+                          <Text style={styles.text}>{data.level}</Text>
+                          <Text style={styles.text}>{secondsToHms(data.time)}</Text>
+                          <Text style={styles.text}>{data.score}</Text>
+                        </View>
+                      )
+                    })
+                  }
+                </ScrollView>
+              </>
+            </>
           </>
         )}
-        <View style={[styles.marBot]}>
+        <View style={[styles.marBot, styles.marTop]}>
           <Button title="NEW GAME" color="green" onPress={gotoHome} />
         </View>
         <View style={[styles.marBot]}>
@@ -84,7 +124,7 @@ export default function Home({ route, navigation }) {
             onPress={() => exit()}
         />
         </View>
-      </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -189,6 +229,9 @@ const styles = StyleSheet.create({
     borderColor: "#888",
     fontSize: 24,
     height: 36,
+  },
+  marTop: {
+    marginTop: 36,
   },
   marBot: {
     marginBottom: 36,

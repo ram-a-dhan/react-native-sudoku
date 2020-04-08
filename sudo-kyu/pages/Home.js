@@ -28,7 +28,7 @@ export default function Home({ navigation }) {
     if (name.length < 3) {
       Alert.alert("INVALID NAME!", "Name must be at least 3 characters!");
     } else {
-      await AsyncStorage.setItem("name", name);
+      await AsyncStorage.setItem("player", JSON.stringify({name}));
       setName("");
       navigation.navigate("Board", { level });
     }

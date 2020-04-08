@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,6 +9,7 @@ import Finish from './pages/Finish.js';
 const Stack = createStackNavigator();
 
 export default function App() {
+  const [leaderBoard, setLeaderBoard] = useState([]);
   return (
     <NavigationContainer>
       <StatusBar backgroundColor="#282c34" barStyle={'light-content'} />
@@ -24,10 +25,13 @@ export default function App() {
         <Stack.Screen
           name="Board"
           component={Board}
+          leaderBoard={leaderBoard}
+          setLeaderBoard={setLeaderBoard}
         />
         <Stack.Screen
           name="Finish"
           component={Finish}
+          leaderBoard={leaderBoard}
         />
       </Stack.Navigator>
     </NavigationContainer>

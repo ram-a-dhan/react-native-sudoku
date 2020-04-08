@@ -11,8 +11,10 @@ import {
   AsyncStorage,
   BackHandler,
 } from "react-native";
+import { useInterval } from "../hooks/stopwatch.js";
+import { secondsToHms } from "../helpers/timeConverter.js";
 
-export default function Board({ route, navigation }) {
+export default function Board({ route, navigation, leaderBoard, setLeaderBoard }) {
   BackHandler.addEventListener("hardwareBackPress",() => true);
 
   //// STATE INITIALIZATIONS ////
@@ -21,7 +23,12 @@ export default function Board({ route, navigation }) {
   const [loading, setLoading] = useState(false);
   const [giveUp, setGiveUp] = useState(false);
   const [time, setTime] = useState(0);
+  const [paused, setPaused] = useState(true);
   ///////////////////////////////
+
+  useInterval(() => {
+    setTime(time + 1);
+  }, paused ? null : 1000);
 
   //// SUGOKU API-RELATED SCRIPTS ////
   const encodeBoard = (board) =>
@@ -39,25 +46,27 @@ export default function Board({ route, navigation }) {
       .join("&");
 
   const fetchSugoku = useCallback(async () => {
+    setPaused(true);
     setLoading(true);
-    const endpoint = `https://sugoku.herokuapp.com/board?difficulty=${route.params.level}`;
+    const endpoint = `https://sugoku2.herokuapp.com/board?difficulty=${route.params.level}`;
     const response = await fetch(endpoint);
     const { board } = await response.json();
     setBoard(board);
     setInput(board);
     setGiveUp(false);
     setLoading(false);
-    // startTimer();
-    // resetTimer();
+    setTime(0);
+    setPaused(false);
   }, []);
   useEffect(() => {
     setGiveUp(false);
     fetchSugoku();
   }, []);
   const checkSugoku = async () => {
+    setPaused(true);
     setLoading(true);
     const data = { board: input };
-    const endpoint = `https://sugoku.herokuapp.com/validate`;
+    const endpoint = `https://sugoku2.herokuapp.com/validate`;
     const options = {
       method: "POST",
       body: encodeParams(data),
@@ -68,21 +77,25 @@ export default function Board({ route, navigation }) {
     const response = await fetch(endpoint, options);
     const { status } = await response.json();
     if (status === "solved") {
-      //
-      // resetTimer();
-      navigation.navigate("Finish", { level: route.params.level });
+      const finishTime = time;
+      const finalScore = scoreCalc(finishTime, route.params.level);
+      const playerData = getPlayer();
+      finishGame(playerData, route.params.level, finishTime, finalScore);
+      // setTime(0);
+      // navigation.navigate("Finish", { level: route.params.level, time: finishTime });
     } else {
       Alert.alert("UNSOLVED", "Incorrect answers! Keep trying!", [
         { text: "CONTINUE" },
       ]);
+      setPaused(false);
     }
     setLoading(false);
   };
   const solveSugoku = async () => {
-    resetTimer();
+    setPaused(true);
     setLoading(true);
     const data = { board };
-    const endpoint = `https://sugoku.herokuapp.com/solve`;
+    const endpoint = `https://sugoku2.herokuapp.com/solve`;
     const options = {
       method: "POST",
       body: encodeParams(data),
@@ -93,8 +106,9 @@ export default function Board({ route, navigation }) {
     const response = await fetch(endpoint, options);
     const { solution } = await response.json();
     setInput(solution);
-    setGiveUp(true);
+    // setGiveUp(true); // ASDWDQWMLDQW
     setLoading(false);
+    // setTime(0); // JDLKMWAD:LAMD
   };
   ////////////////////////////////////
 
@@ -115,8 +129,9 @@ export default function Board({ route, navigation }) {
 
   const resetSugoku = () => {
     setInput(board);
-    resetTimer();
-    // startTimer();
+    setPaused(true);
+    setTime(0);
+    setPaused(false);
   };
 
   const confirm = (title, message, action) => {
@@ -125,25 +140,45 @@ export default function Board({ route, navigation }) {
       { text: "NO", style: "cancel" },
     ]);
   };
-  var startTimer = () => {
-    setInterval(() => {
-      console.log(time, "sec");
-      setTime(time + 1);
-      // console.warn(time,'sec');
-    }, 1000);
-  };
-  var resetTimer = () => {
-    clearInterval(startTimer);
-    setTime(0);
-  };
+
   const gotoHome = async () => {
-    resetTimer();
+    setPaused(true);
+    setTime(0);
     await AsyncStorage.removeItem("name");
     navigation.navigate("Home");
   };
   ////////////////////////
 
-  // {!giveUp && ()} // ini sebagai cadangan. lihat komentar di line 200 utk penjelasan
+  const scoreCalc = (playTime, difficulty) => {
+    const maxTime = 3600000;
+    const constant = 10810.81081081081;
+    let baseScore = ((maxTime - playTime) / constant);
+    if (difficulty === 'hard') {
+      return 3 * baseScore;
+    } else if (difficulty === 'medium') {
+      return 2 * baseScore;
+    } else {
+      return baseScore;
+    }
+  }
+
+  const getPlayer = useCallback(async () => {
+    let unparsed = await AsyncStorage.getItem("player");
+    return await JSON.parse(unparsed);
+  });
+
+  const finishGame =(data, diff, time, score) => {
+    data.diff = diff;
+    data.time = time;
+    data.score = score;
+    if (leaderBoard.length) {
+      setLeaderBoard([...leaderBoard, data])
+    } else {
+      setLeaderBoard([data])
+    }
+    setTime(0);
+    navigation.navigate("Finish");
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -159,7 +194,7 @@ export default function Board({ route, navigation }) {
         )) || (
           <View>
             <View style={[styles.fixToText2]}>
-              <Text style={[styles.text]}>Time: {time} secs</Text>
+              <Text style={[styles.text]}>Time: {secondsToHms(time)}</Text>
               <Text style={[styles.text]}>Level: {route.params.level}</Text>
             </View>
             {input.map((row, i) => (
@@ -197,7 +232,7 @@ export default function Board({ route, navigation }) {
         )}
         {!loading && (
           <>
-          {!giveUp && ( // hapus line ini & bracket penutupnya untuk testing laman Finish
+          {!giveUp && (
             <View style={styles.fixToText}>
               <>
                 <Button
