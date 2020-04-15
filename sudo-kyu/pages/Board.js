@@ -15,9 +15,10 @@ import { useInterval } from "../hooks/stopwatch.js";
 import { secondsToHms } from "../helpers/timeConverter.js";
 
 export default function Board({ route, navigation, leaderBoard, setLeaderBoard }) {
-  BackHandler.addEventListener("hardwareBackPress",() => true);
+  // BackHandler.addEventListener("hardwareBackPress",() => true);
 
   //// STATE INITIALIZATIONS ////
+  const [name, setName] = useState("");
   const [board, setBoard] = useState([]);
   const [input, setInput] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -79,8 +80,8 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     if (status === "solved") {
       const finishTime = time;
       const finalScore = scoreCalc(finishTime, route.params.level);
-      const playerData = getPlayer();
-      finishGame(playerData, route.params.level, finishTime, finalScore);
+      const playerName = name;
+      finishGame(playerName, route.params.level, finishTime, finalScore);
       // setTime(0);
       // navigation.navigate("Finish", { level: route.params.level, time: finishTime });
     } else {
@@ -147,6 +148,12 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     await AsyncStorage.removeItem("name");
     navigation.navigate("Home");
   };
+  const getName = useCallback(async () => {
+    setName(await AsyncStorage.getItem("name"));
+  });
+  useEffect(() => {
+    getName();
+  }, []);
   ////////////////////////
 
   const scoreCalc = (playTime, difficulty) => {
@@ -164,13 +171,12 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
 
   const getPlayer = useCallback(async () => {
     let unparsed = await AsyncStorage.getItem("player");
-    return await JSON.parse(unparsed);
+    let parsed = await JSON.parse(unparsed);
+    return await parsed;
   });
 
-  const finishGame =(data, diff, time, score) => {
-    data.diff = diff;
-    data.time = time;
-    data.score = score;
+  const finishGame =(name, diff, time, score) => {
+    const data = { name, diff, time, score }
     if (leaderBoard.length) {
       setLeaderBoard([...leaderBoard, data])
     } else {
@@ -230,7 +236,6 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
             ))}
           </View>
         )}
-        {!loading && (
           <>
           {!giveUp && (
             <View style={styles.fixToText}>
@@ -284,7 +289,6 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
               />
             </View>
           </>
-        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );

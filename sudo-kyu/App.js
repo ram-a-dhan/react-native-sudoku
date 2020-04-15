@@ -24,15 +24,19 @@ export default function App() {
         />
         <Stack.Screen
           name="Board"
-          component={Board}
-          leaderBoard={leaderBoard}
-          setLeaderBoard={setLeaderBoard}
-        />
+          // component={Board}
+          // leaderBoard={leaderBoard}
+          // setLeaderBoard={setLeaderBoard}
+        >
+          {props => (<Board {...props} leaderBoard={leaderBoard} setLeaderBoard={setLeaderBoard}/>)}
+        </Stack.Screen>
         <Stack.Screen
           name="Finish"
-          component={Finish}
-          leaderBoard={leaderBoard}
-        />
+          // component={Finish}
+          // leaderBoard={leaderBoard}
+        >
+          {props => (<Finish {...props} leaderBoard={leaderBoard}/>)}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );

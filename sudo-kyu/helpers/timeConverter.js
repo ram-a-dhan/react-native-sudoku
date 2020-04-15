@@ -9,3 +9,15 @@ export const secondsToHms = (time) => {
     var sDisplay = s > 0 ? s + (s == 1 ? " sec" : " secs") : "";
     return hDisplay + mDisplay + sDisplay;
 }
+
+export const resultTime = (time) => {
+    time = Number(time);
+    var h = Math.floor(time / 3600);
+    var m = Math.floor(time % 3600 / 60);
+    var s = Math.floor(time % 3600 % 60);
+
+    var hDisplay = h > 0 ? h + "h" : "";
+    var mDisplay = m > 0 ? m + "m" : "";
+    var sDisplay = s > 0 ? s + "s" : "";
+    return hDisplay + mDisplay + sDisplay;
+}

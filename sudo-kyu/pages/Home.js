@@ -13,7 +13,7 @@ import {
 } from "react-native";
 
 export default function Home({ navigation }) {
-  BackHandler.addEventListener("hardwareBackPress",() => true);
+  // BackHandler.addEventListener("hardwareBackPress",() => true);
   const exit = () => {
     confirm("EXIT APP?", "Exit from Sudo-Kyu?",() => BackHandler.exitApp());
   }
@@ -28,7 +28,7 @@ export default function Home({ navigation }) {
     if (name.length < 3) {
       Alert.alert("INVALID NAME!", "Name must be at least 3 characters!");
     } else {
-      await AsyncStorage.setItem("player", JSON.stringify({name}));
+      await AsyncStorage.setItem("name", name);
       setName("");
       navigation.navigate("Board", { level });
     }

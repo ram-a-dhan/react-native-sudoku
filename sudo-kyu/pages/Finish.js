@@ -11,22 +11,22 @@ import {
   BackHandler,
   Alert,
 } from "react-native";
-import { secondsToHms } from "../helpers/timeConverter.js";
+import { resultTime } from "../helpers/timeConverter.js";
 
 export default function Home({ route, navigation, leaderBoard }) {
-  const dummy = [
-    {name: "a", score: "1", time: "1", level: "a"},
-    {name: "b", score: "2", time: "2", level: "b"},
-    {name: "c", score: "3", time: "3", level: "c"},
-    {name: "d", score: "4", time: "4", level: "d"},
-    {name: "e", score: "5", time: "5", level: "e"},
-    {name: "a", score: "1", time: "1", level: "a"},
-    {name: "b", score: "2", time: "2", level: "b"},
-    {name: "c", score: "3", time: "3", level: "c"},
-    {name: "d", score: "4", time: "4", level: "d"},
-    {name: "e", score: "5", time: "5", level: "e"},
-  ];
-  BackHandler.addEventListener("hardwareBackPress",() => true);
+  // const dummy = [
+  //   {name: "a", score: "1", time: "1", level: "a"},
+  //   {name: "b", score: "2", time: "2", level: "b"},
+  //   {name: "c", score: "3", time: "3", level: "c"},
+  //   {name: "d", score: "4", time: "4", level: "d"},
+  //   {name: "e", score: "5", time: "5", level: "e"},
+  //   {name: "a", score: "1", time: "1", level: "a"},
+  //   {name: "b", score: "2", time: "2", level: "b"},
+  //   {name: "c", score: "3", time: "3", level: "c"},
+  //   {name: "d", score: "4", time: "4", level: "d"},
+  //   {name: "e", score: "5", time: "5", level: "e"},
+  // ];
+  // BackHandler.addEventListener("hardwareBackPress",() => true);
   const exit = () => {
     confirm("EXIT APP?", "Exit from Sudo-Kyu?",() => BackHandler.exitApp());
   }
@@ -51,7 +51,7 @@ export default function Home({ route, navigation, leaderBoard }) {
   return (
     <KeyboardAvoidingView style={styles.containerHome}>
       <View>
-        {(!name && (
+        {(!leaderBoard && (
           <>
             <Text style={[styles.text, styles.loadingText]}>Loading</Text>
             <Text style={[styles.text, styles.loadingText]}>...</Text>
@@ -77,7 +77,7 @@ export default function Home({ route, navigation, leaderBoard }) {
                 <Text
                   style={[styles.textSummary, styles.textRight, styles.textBold]}
                 >
-                  {secondsToHms(route.params.time)}
+                  {resultTime(route.params.time)}
                 </Text>
                 <Text style={[styles.textSummary, styles.textLeft]}>Level:</Text>
                 <Text
@@ -101,10 +101,10 @@ export default function Home({ route, navigation, leaderBoard }) {
                     leaderBoard.map((data, idx) => {
                       return(
                         <View key={idx} style={styles.fixToText}>
-                          <Text style={styles.text}>{data.name}</Text>
-                          <Text style={styles.text}>{data.level}</Text>
-                          <Text style={styles.text}>{secondsToHms(data.time)}</Text>
-                          <Text style={styles.text}>{data.score}</Text>
+                          <Text style={styles.text, styles.textLeft}>{data.name}</Text>
+                          <Text style={styles.text, styles.textRight}>{Math.trunc(data.score)}</Text>
+                          <Text style={styles.text, styles.textRight}>{resultTime(data.time)}</Text>
+                          <Text style={styles.text, styles.textRight}>{data.diff === 'medium' ? 'med' : data.diff}</Text>
                         </View>
                       )
                     })
