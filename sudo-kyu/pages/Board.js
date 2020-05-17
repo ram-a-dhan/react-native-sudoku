@@ -1,4 +1,8 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback
+} from "react";
 import {
   StyleSheet,
   Text,
@@ -9,15 +13,13 @@ import {
   KeyboardAvoidingView,
   Alert,
   AsyncStorage,
-  BackHandler,
 } from "react-native";
 import { useInterval } from "../hooks/stopwatch.js";
-import { secondsToHms } from "../helpers/timeConverter.js";
+import { inGameTime } from "../helpers/timeConverter.js";
 
 export default function Board({ route, navigation, leaderBoard, setLeaderBoard }) {
-  // BackHandler.addEventListener("hardwareBackPress",() => true);
 
-  //// STATE INITIALIZATIONS ////
+  //// STATE INITIALISATIONS ////
   const [name, setName] = useState("");
   const [board, setBoard] = useState([]);
   const [input, setInput] = useState([]);
@@ -26,6 +28,17 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
   const [time, setTime] = useState(0);
   const [paused, setPaused] = useState(true);
   ///////////////////////////////
+
+  useEffect(() => {
+    setGiveUp(false);
+    getName();
+    fetchSugoku();
+  }, []);
+
+  const getName = useCallback(async () => {
+    setName(await AsyncStorage.getItem("name"));
+  });
+
 
   useInterval(() => {
     setTime(time + 1);
@@ -58,10 +71,6 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     setLoading(false);
     setTime(0);
     setPaused(false);
-  }, []);
-  useEffect(() => {
-    setGiveUp(false);
-    fetchSugoku();
   }, []);
   const checkSugoku = async () => {
     setPaused(true);
@@ -107,9 +116,9 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     const response = await fetch(endpoint, options);
     const { solution } = await response.json();
     setInput(solution);
-    // setGiveUp(true); // ASDWDQWMLDQW
+    // setGiveUp(true); // DISABLED FOR TESTING PURPOSES
     setLoading(false);
-    // setTime(0); // JDLKMWAD:LAMD
+    // setTime(0); // DISABLED FOR TESTING PURPOSES
   };
   ////////////////////////////////////
 
@@ -148,12 +157,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     await AsyncStorage.removeItem("name");
     navigation.navigate("Home");
   };
-  const getName = useCallback(async () => {
-    setName(await AsyncStorage.getItem("name"));
-  });
-  useEffect(() => {
-    getName();
-  }, []);
+
   ////////////////////////
 
   const scoreCalc = (playTime, difficulty) => {
@@ -200,7 +204,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
         )) || (
           <View>
             <View style={[styles.fixToText2]}>
-              <Text style={[styles.text]}>Time: {secondsToHms(time)}</Text>
+              <Text style={[styles.text]}>Time: {inGameTime(time)}</Text>
               <Text style={[styles.text]}>Level: {route.params.level}</Text>
             </View>
             {input.map((row, i) => (
@@ -241,17 +245,23 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
             <View style={styles.fixToText}>
               <>
                 <Button
-                  title="GIVE UP"
+                  title="🏳 GIVE UP"
                   color="grey"
                   onPress={() =>
-                    confirm("GIVING UP?", "Give up and see the solution?", () =>
-                      solveSugoku()
+                    confirm(
+                      "GIVING UP?",
+                      "Give up and see the solution?",
+                      () => solveSugoku()
                     )
                   }
                 />
-                <Button title="CHECK" color="" onPress={checkSugoku} />
                 <Button
-                  title="RESTART"
+                  title="🔍 CHECK"
+                  color="dodgerblue"
+                  onPress={checkSugoku}
+                />
+                <Button
+                  title="🔄 RESTART"
                   color="darkorange"
                   onPress={() =>
                     confirm(
@@ -266,8 +276,8 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
           )}
             <View style={styles.fixToText}>
               <Button
-                title="GO TO HOME"
-                color="green"
+                title="🏠 GO TO HOME"
+                color="forestgreen"
                 onPress={() =>
                   confirm(
                     "BACK TO HOME?",
@@ -277,7 +287,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
                 }
               />
               <Button
-                title="NEW BOARD"
+                title="🌟 NEW BOARD"
                 color="crimson"
                 onPress={() =>
                   confirm(

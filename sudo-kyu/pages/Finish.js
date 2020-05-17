@@ -1,43 +1,17 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import {
   AsyncStorage,
   StyleSheet,
   Text,
-  TextInput,
   Button,
   View,
   ScrollView,
   KeyboardAvoidingView,
-  BackHandler,
   Alert,
 } from "react-native";
 import { resultTime } from "../helpers/timeConverter.js";
 
-export default function Home({ route, navigation, leaderBoard }) {
-  // const dummy = [
-  //   {name: "a", score: "1", time: "1", level: "a"},
-  //   {name: "b", score: "2", time: "2", level: "b"},
-  //   {name: "c", score: "3", time: "3", level: "c"},
-  //   {name: "d", score: "4", time: "4", level: "d"},
-  //   {name: "e", score: "5", time: "5", level: "e"},
-  //   {name: "a", score: "1", time: "1", level: "a"},
-  //   {name: "b", score: "2", time: "2", level: "b"},
-  //   {name: "c", score: "3", time: "3", level: "c"},
-  //   {name: "d", score: "4", time: "4", level: "d"},
-  //   {name: "e", score: "5", time: "5", level: "e"},
-  // ];
-  // BackHandler.addEventListener("hardwareBackPress",() => true);
-  const exit = () => {
-    confirm("EXIT APP?", "Exit from Sudo-Kyu?",() => BackHandler.exitApp());
-  }
-
-  const [name, setName] = useState("");
-  // const getName = useCallback(async () => {
-  //   setName(await AsyncStorage.getItem("name"));
-  // });
-  useEffect(() => {
-    // getName();
-  }, []);
+export default function Home({ navigation, leaderBoard }) {
   const gotoHome = async () => {
     await AsyncStorage.removeItem("player");
     navigation.navigate("Home");
@@ -51,43 +25,15 @@ export default function Home({ route, navigation, leaderBoard }) {
   return (
     <KeyboardAvoidingView style={styles.containerHome}>
       <View>
-        {(!leaderBoard && (
+        {(!leaderBoard &&
           <>
             <Text style={[styles.text, styles.loadingText]}>Loading</Text>
             <Text style={[styles.text, styles.loadingText]}>...</Text>
           </>
-        )) || (
+        ) || (!leaderBoard.length &&
           <>
-            {/* <>
-              <Text style={[styles.text, styles.title]}>FINISHED!</Text>
-              <View style={[styles.marBot]}>
-                <Text style={[styles.textSummary, styles.textLeft]}>Name:</Text>
-                <Text
-                  style={[styles.textSummary, styles.textRight, styles.textBold]}
-                >
-                  {name}
-                </Text>
-                <Text style={[styles.textSummary, styles.textLeft]}>Score:</Text>
-                <Text
-                  style={[styles.textSummary, styles.textRight, styles.textBold]}
-                >
-                  100
-                </Text>
-                <Text style={[styles.textSummary, styles.textLeft]}>Time:</Text>
-                <Text
-                  style={[styles.textSummary, styles.textRight, styles.textBold]}
-                >
-                  {resultTime(route.params.time)}
-                </Text>
-                <Text style={[styles.textSummary, styles.textLeft]}>Level:</Text>
-                <Text
-                  style={[styles.textSummary, styles.textRight, styles.textBold]}
-                >
-                  {route.params.level}
-                </Text>
-              </View>
-            </> */}
-            <>
+          </>
+        ) || (
               <>
                 <Text style={[styles.text, styles.title]}>LEADERBOARD</Text>
                 <View style={styles.fixToText}>
@@ -111,18 +57,9 @@ export default function Home({ route, navigation, leaderBoard }) {
                   }
                 </ScrollView>
               </>
-            </>
-          </>
         )}
         <View style={[styles.marBot, styles.marTop]}>
           <Button title="NEW GAME" color="green" onPress={gotoHome} />
-        </View>
-        <View style={[styles.marBot]}>
-          <Button
-            title="EXIT APP"
-            color="red"
-            onPress={() => exit()}
-        />
         </View>
       </View>
     </KeyboardAvoidingView>

@@ -12,30 +12,31 @@ export default function App() {
   const [leaderBoard, setLeaderBoard] = useState([]);
   return (
     <NavigationContainer>
-      <StatusBar backgroundColor="#282c34" barStyle={'light-content'} />
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false
-        }}
-      >
+      <StatusBar
+        backgroundColor="#282c34"
+        barStyle={'light-content'}
+      />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen
           name="Home"
           component={Home}
         />
-        <Stack.Screen
-          name="Board"
-          // component={Board}
-          // leaderBoard={leaderBoard}
-          // setLeaderBoard={setLeaderBoard}
-        >
-          {props => (<Board {...props} leaderBoard={leaderBoard} setLeaderBoard={setLeaderBoard}/>)}
+        <Stack.Screen name="Board">
+          {props => (
+            <Board
+              {...props}
+              leaderBoard={leaderBoard}
+              setLeaderBoard={setLeaderBoard}
+            />
+          )}
         </Stack.Screen>
-        <Stack.Screen
-          name="Finish"
-          // component={Finish}
-          // leaderBoard={leaderBoard}
-        >
-          {props => (<Finish {...props} leaderBoard={leaderBoard}/>)}
+        <Stack.Screen name="Finish">
+          {props => (
+            <Finish
+              {...props}
+              leaderBoard={leaderBoard}
+            />
+          )}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>

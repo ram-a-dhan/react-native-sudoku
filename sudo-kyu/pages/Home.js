@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, {
+  useState,
+  useEffect,
+} from "react";
 import {
   AsyncStorage,
   StyleSheet,
@@ -8,25 +11,34 @@ import {
   View,
   ScrollView,
   KeyboardAvoidingView,
-  BackHandler,
   Alert,
 } from "react-native";
+import * as Font from "expo-font";
 
 export default function Home({ navigation }) {
-  // BackHandler.addEventListener("hardwareBackPress",() => true);
-  const exit = () => {
-    confirm("EXIT APP?", "Exit from Sudo-Kyu?",() => BackHandler.exitApp());
-  }
 
   const [name, setName] = useState("");
+  const [fontsReady, setFontsReady] = useState(false);
+
+  useEffect(() => {
+    loadFonts()
+      .then(() => setFontsReady(true))
+  }, []);
+
+  const loadFonts = async () => {
+    return await Font.loadAsync({
+      kashima: require('../assets/font_kashima.otf'),
+      hiroshima: require('../assets/font_hiroshima.otf'),
+    })
+  }
 
   const changeName = (text) => {
     setName(text);
   };
 
   const gotoBoard = async (level) => {
-    if (name.length < 3) {
-      Alert.alert("INVALID NAME!", "Name must be at least 3 characters!");
+    if (name.length < 3 && name.length > 5) {
+      Alert.alert("INVALID NAME!", "Name must be no less than 3 characters & no more than 5 characters!");
     } else {
       await AsyncStorage.setItem("name", name);
       setName("");
@@ -34,49 +46,37 @@ export default function Home({ navigation }) {
     }
   };
 
-  const confirm = (title, message, action) => {
-    Alert.alert(title, message, [
-      { text: "YES", onPress: action },
-      { text: "NO", style: "cancel" },
-    ]);
-  };
   return (
     <KeyboardAvoidingView style={styles.containerHome}>
-      <ScrollView>
-        <Text style={[styles.text, styles.title]}>SUDO-KYU</Text>
-        <Text style={[styles.text, styles.marBot]}>ENTER YOUR NAME:</Text>
-        <TextInput
-          style={[styles.nameStyle, styles.text, styles.marBot]}
-          onChangeText={(text) => changeName(text)}
-          defaultValue={name}
-        ></TextInput>
-        <Text style={[styles.text]}>SET THE LEVEL:</Text>
-        <View style={[styles.fixToText, styles.marBot]}>
-          {/* <Button title="START" color="green" onPress={gotoBoard}  /> */}
-          <Button
-            title="EASY"
-            color="green"
-            onPress={() => gotoBoard("easy")}
-          />
-          <Button
-            title="MEDIUM"
-            color=""
-            onPress={() => gotoBoard("medium")}
-          />
-          <Button
-            title="HARD"
-            color="orange"
-            onPress={() => gotoBoard("hard")}
-          />
-        </View>
-        <View style={[styles.fixToText3, styles.marBot]}>
-          <Button
-            title="EXIT APP"
-            color="red"
-            onPress={() => exit()}
-          />
-        </View>
-      </ScrollView>
+      {fontsReady && (
+        <ScrollView>
+          <Text style={[styles.text, styles.marTop, styles.title]}>SUDO-KYU</Text>
+          <Text style={[styles.text, styles.marBot]}>ENTER YOUR NAME:</Text>
+          <TextInput
+            style={[styles.nameStyle, styles.text, styles.marBot]}
+            onChangeText={(text) => changeName(text)}
+            defaultValue={name}
+          ></TextInput>
+          <Text style={[styles.text]}>SET THE LEVEL:</Text>
+          <View style={[styles.fixToText, styles.marBot]}>
+            <Button
+              title="👨 EASY"
+              color="forestgreen"
+              onPress={() => gotoBoard("easy")}
+            />
+            <Button
+              title="🤖 MEDIUM"
+              color="dodgerblue"
+              onPress={() => gotoBoard("medium")}
+            />
+            <Button
+              title="👽 HARD"
+              color="crimson"
+              onPress={() => gotoBoard("hard")}
+            />
+          </View>
+        </ScrollView>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -97,14 +97,16 @@ const styles = StyleSheet.create({
   text: {
     color: "white",
     textAlign: "center",
+    fontFamily: "hiroshima",
   },
   warning: {
     color: "crimson",
     textAlign: "center",
   },
   title: {
-    fontSize: 36,
+    fontSize: 60,
     margin: 36,
+    fontFamily: "kashima",
   },
   rowStyle: {
     flex: 1,
@@ -155,11 +157,6 @@ const styles = StyleSheet.create({
     fontSize: 36,
     margin: 0,
   },
-  // startPage: {
-  //   flexDirection: "column",
-  //   justifyContent: "space-around",
-  //   // paddingVertical: 24,
-  // },
   nameStyle: {
     borderWidth: 1,
     color: "#61dafb",
@@ -167,6 +164,9 @@ const styles = StyleSheet.create({
     borderColor: "#888",
     fontSize: 24,
     height: 36,
+  },
+  marTop: {
+    marginTop: 126,
   },
   marBot: {
     marginBottom: 36,
