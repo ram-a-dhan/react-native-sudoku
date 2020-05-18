@@ -13,14 +13,20 @@ import {
   KeyboardAvoidingView,
   Alert,
   AsyncStorage,
+  ToastAndroid,
 } from "react-native";
-import { useInterval } from "../hooks/stopwatch.js";
+import { encodeParams } from "../helpers/encodeSugoku";
+import { useInterval } from "../helpers/stopwatch.js";
 import { inGameTime } from "../helpers/timeConverter.js";
+import { loadFonts } from "../helpers/fontsLoader";
+import { scoreCalc } from "../helpers/scoreCalculator";
+import { confirm } from "../helpers/confirmBox";
 
 export default function Board({ route, navigation, leaderBoard, setLeaderBoard }) {
 
   //// STATE INITIALISATIONS ////
   const [name, setName] = useState("");
+  const [fontsReady, setFontsReady] = useState(false);
   const [board, setBoard] = useState([]);
   const [input, setInput] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,8 +36,10 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
   ///////////////////////////////
 
   useEffect(() => {
-    setGiveUp(false);
     getName();
+    loadFonts()
+      .then(() => setFontsReady(true));
+    setGiveUp(false);
     fetchSugoku();
   }, []);
 
@@ -39,30 +47,16 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     setName(await AsyncStorage.getItem("name"));
   });
 
-
   useInterval(() => {
     setTime(time + 1);
   }, paused ? null : 1000);
 
-  //// SUGOKU API-RELATED SCRIPTS ////
-  const encodeBoard = (board) =>
-    board.reduce(
-      (result, row, i) =>
-        result +
-        `%5B${encodeURIComponent(row)}%5D${
-          i === board.length - 1 ? "" : "%2C"
-        }`,
-      ""
-    );
-  const encodeParams = (params) =>
-    Object.keys(params)
-      .map((key) => key + "=" + `%5B${encodeBoard(params[key])}%5D`)
-      .join("&");
-
+  //// SUGOKU API ////
   const fetchSugoku = useCallback(async () => {
     setPaused(true);
     setLoading(true);
-    const endpoint = `https://sugoku2.herokuapp.com/board?difficulty=${route.params.level}`;
+    const endpoint =
+      `https://sugoku2.herokuapp.com/board?difficulty=${route.params.level}`;
     const response = await fetch(endpoint);
     const { board } = await response.json();
     setBoard(board);
@@ -72,6 +66,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     setTime(0);
     setPaused(false);
   }, []);
+
   const checkSugoku = async () => {
     setPaused(true);
     setLoading(true);
@@ -91,16 +86,13 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
       const finalScore = scoreCalc(finishTime, route.params.level);
       const playerName = name;
       finishGame(playerName, route.params.level, finishTime, finalScore);
-      // setTime(0);
-      // navigation.navigate("Finish", { level: route.params.level, time: finishTime });
     } else {
-      Alert.alert("UNSOLVED", "Incorrect answers! Keep trying!", [
-        { text: "CONTINUE" },
-      ]);
+      ToastAndroid.show("Incorrect answers! Keep trying!", 2000)
       setPaused(false);
     }
     setLoading(false);
   };
+
   const solveSugoku = async () => {
     setPaused(true);
     setLoading(true);
@@ -116,14 +108,13 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     const response = await fetch(endpoint, options);
     const { solution } = await response.json();
     setInput(solution);
-    // setGiveUp(true); // DISABLED FOR TESTING PURPOSES
+    setGiveUp(true); // DISABLE THIS FOR TESTING PURPOSES
     setLoading(false);
-    // setTime(0); // DISABLED FOR TESTING PURPOSES
+    setTime(0); // DISABLE THIS FOR TESTING PURPOSES
   };
-  ////////////////////////////////////
+  ////////////////////
 
-  //// EVENT HANDLERS ////
-  const handleChange = (text, i, j) => {
+  const handleInput = (text, i, j) => {
     let newInput = [],
       temp = [];
     for (let x = 0; x < input.length; x++) {
@@ -144,40 +135,12 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     setPaused(false);
   };
 
-  const confirm = (title, message, action) => {
-    Alert.alert(title, message, [
-      { text: "YES", onPress: action },
-      { text: "NO", style: "cancel" },
-    ]);
-  };
-
   const gotoHome = async () => {
     setPaused(true);
     setTime(0);
     await AsyncStorage.removeItem("name");
     navigation.navigate("Home");
   };
-
-  ////////////////////////
-
-  const scoreCalc = (playTime, difficulty) => {
-    const maxTime = 3600000;
-    const constant = 10810.81081081081;
-    let baseScore = ((maxTime - playTime) / constant);
-    if (difficulty === 'hard') {
-      return 3 * baseScore;
-    } else if (difficulty === 'medium') {
-      return 2 * baseScore;
-    } else {
-      return baseScore;
-    }
-  }
-
-  const getPlayer = useCallback(async () => {
-    let unparsed = await AsyncStorage.getItem("player");
-    let parsed = await JSON.parse(unparsed);
-    return await parsed;
-  });
 
   const finishGame =(name, diff, time, score) => {
     const data = { name, diff, time, score }
@@ -192,114 +155,130 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
 
   return (
     <KeyboardAvoidingView style={styles.container}>
-      <ScrollView>
-        {(loading && (
-          <>
-            <Text style={[styles.text]}></Text>
-            <View style={styles.loadingBox}>
-              <Text style={[styles.text, styles.loadingText]}>loading</Text>
-              <Text style={[styles.text, styles.loadingText]}>...</Text>
-            </View>
-          </>
-        )) || (
-          <View>
-            <View style={[styles.fixToText2]}>
-              <Text style={[styles.text]}>Time: {inGameTime(time)}</Text>
-              <Text style={[styles.text]}>Level: {route.params.level}</Text>
-            </View>
-            {input.map((row, i) => (
-              <View key={i} style={styles.rowStyle}>
-                {row.map((col, j) => {
-                  if (board[i][j]) {
-                    return (
-                      <TextInput
-                        key={j}
-                        style={[styles.colStyle, styles.text, styles.apiInput, styles.lightBg]}
-                        keyboardType="numeric"
-                        maxLength={1}
-                        editable={false}
-                        defaultValue={col.toString()}
-                      ></TextInput>
-                    );
-                  } else {
-                    return (
-                      <TextInput
-                        key={j}
-                        style={[styles.colStyle, styles.text, styles.userInput, styles.darkBg]}
-                        keyboardType="numeric"
-                        maxLength={1}
-                        editable={true}
-                        onChangeText={(text) => handleChange(text, i, j)}
-                      >
-                        {col === 0 ? "" : col}
-                      </TextInput>
-                    );
-                  }
-                })}
+      {fontsReady && (
+        <ScrollView>
+          {(loading && (
+            <>
+              <Text style={[styles.text]}></Text>
+              <View style={styles.loadingBox}>
+                <Text style={[styles.text, styles.loadingText]}>loading</Text>
+                <Text style={[styles.text, styles.loadingText]}>...</Text>
               </View>
-            ))}
-          </View>
-        )}
-          <>
-          {!giveUp && (
-            <View style={styles.fixToText}>
-              <>
-                <Button
-                  title="🏳 GIVE UP"
-                  color="grey"
-                  onPress={() =>
-                    confirm(
-                      "GIVING UP?",
-                      "Give up and see the solution?",
-                      () => solveSugoku()
-                    )
-                  }
-                />
-                <Button
-                  title="🔍 CHECK"
-                  color="dodgerblue"
-                  onPress={checkSugoku}
-                />
-                <Button
-                  title="🔄 RESTART"
-                  color="darkorange"
-                  onPress={() =>
-                    confirm(
-                      "RESET BOARD?",
-                      "Clear your input and start over?",
-                      () => resetSugoku()
-                    )
-                  }
-                />
-              </>
+            </>
+          )) || (
+            <View>
+              <View style={[styles.fixToText2]}>
+                <Text style={[styles.text]}>Time: {inGameTime(time)}</Text>
+                <Text style={[styles.text]}>Level: {route.params.level}</Text>
+              </View>
+              {input.map((row, i) => (
+                <View key={i} style={styles.rowStyle}>
+                  {row.map((col, j) => {
+                    if (board[i][j]) {
+                      return (
+                        <TextInput
+                          key={j}
+                          style={[
+                            styles.colStyle,
+                            styles.text,
+                            styles.apiInput,
+                            styles.lightBg,
+                            i !== 0 && i % 3 === 0 ? styles.rowBorder : styles.noBorder,
+                            j !== 0 && j % 3 === 0 ? styles.colBorder : styles.noBorder,
+                          ]}
+                          keyboardType="numeric"
+                          maxLength={1}
+                          editable={false}
+                          defaultValue={col.toString()}
+                        ></TextInput>
+                      );
+                    } else {
+                      return (
+                        <TextInput
+                          key={j}
+                          style={[
+                            styles.colStyle,
+                            styles.text,
+                            styles.userInput,
+                            styles.darkBg,
+                            i !== 0 && i % 3 === 0 ? styles.rowBorder : styles.noBorder,
+                            j !== 0 && j % 3 === 0 ? styles.colBorder : styles.noBorder,
+                          ]}
+                          keyboardType="numeric"
+                          maxLength={1}
+                          editable={!giveUp}
+                          onChangeText={(text) => handleInput(text, i, j)}
+                        >
+                          {col === 0 ? "" : col}
+                        </TextInput>
+                      );
+                    }
+                  })}
+                </View>
+              ))}
             </View>
           )}
-            <View style={styles.fixToText}>
-              <Button
-                title="🏠 GO TO HOME"
-                color="forestgreen"
-                onPress={() =>
-                  confirm(
-                    "BACK TO HOME?",
-                    "Quit this game and go back to Home?",
-                    () => gotoHome()
-                  )
-                }
-              />
-              <Button
-                title="🌟 NEW BOARD"
-                color="crimson"
-                onPress={() =>
-                  confirm(
-                    "PLAY NEW BOARD?",
-                    "Get a different new board to play?",
-                    () => fetchSugoku()
-                  )
-                }
-              />
-            </View>
-          </>
-      </ScrollView>
+            <>
+            {!giveUp && (
+              <View style={styles.fixToText}>
+                <>
+                  <Button
+                    title="🏳 GIVE UP"
+                    color="grey"
+                    onPress={() =>
+                      confirm(
+                        "GIVING UP?",
+                        "Give up and see the solution?",
+                        () => solveSugoku()
+                      )
+                    }
+                  />
+                  <Button
+                    title="🔍 CHECK"
+                    color="dodgerblue"
+                    onPress={checkSugoku}
+                  />
+                  <Button
+                    title="🔄 RESTART"
+                    color="darkorange"
+                    onPress={() =>
+                      confirm(
+                        "RESET BOARD?",
+                        "Clear your input and start over?",
+                        () => resetSugoku()
+                      )
+                    }
+                  />
+                </>
+              </View>
+            )}
+              <View style={styles.fixToText}>
+                <Button
+                  title="🏠 GO TO HOME"
+                  color="forestgreen"
+                  onPress={() =>
+                    confirm(
+                      "BACK TO HOME?",
+                      "Quit this game and go back to Home?",
+                      () => gotoHome()
+                    )
+                  }
+                />
+                <Button
+                  title="🌟 NEW BOARD"
+                  color="crimson"
+                  onPress={() =>
+                    confirm(
+                      "PLAY NEW BOARD?",
+                      "Get a different new board to play?",
+                      () => fetchSugoku()
+                    )
+                  }
+                />
+              </View>
+            </>
+        </ScrollView>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -315,41 +294,47 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
   },
-  title: {
-    fontSize: 36,
-    margin: 36,
-  },
   rowStyle: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "flex-start",
-    borderWidth: 1,
-    borderColor: "#888",
+    borderWidth: 0,
     maxHeight: 36,
   },
   colStyle: {
-    borderWidth: 1,
-    borderColor: "#888",
+    borderWidth: .5,
+    borderColor: "#000",
     width: 36,
     height: 36,
     fontSize: 24,
   },
-  apiInput: {
-    color: "#61dafb",
+  rowBorder: {
+    borderTopWidth: 2,
   },
+  colBorder: {
+    borderLeftWidth: 2,
+  },
+  noBorder: {},
   lightBg: {
-    backgroundColor: "#3d4148",
+    backgroundColor: "#282c34",
   },
   darkBg: {
-    backgroundColor: "#24272e",
+    backgroundColor: "#3d4148",
+  },
+  apiInput: {
+    color: "lightsteelblue",
+    fontFamily: "kashima",
+    fontSize: 36,
   },
   userInput: {
     color: "white",
+    fontFamily: "hiroshima",
+    fontSize: 24,
   },
-  emptyCell: {
-    color: "#444",
-  },
+  // emptyCell: {
+  //   // color: "#444",
+  // },
   fixToText: {
     flexDirection: "row",
     justifyContent: "space-around",
