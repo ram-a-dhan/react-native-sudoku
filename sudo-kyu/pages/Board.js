@@ -11,7 +11,6 @@ import {
   View,
   ScrollView,
   KeyboardAvoidingView,
-  Alert,
   AsyncStorage,
   ToastAndroid,
 } from "react-native";
