@@ -4,7 +4,6 @@ import React, {
   useCallback
 } from "react";
 import {
-  StyleSheet,
   Text,
   TextInput,
   Button,
@@ -13,6 +12,7 @@ import {
   KeyboardAvoidingView,
   AsyncStorage,
   ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import { encodeParams } from "../helpers/encodeSugoku";
 import { useInterval } from "../helpers/stopwatch.js";
@@ -20,6 +20,7 @@ import { inGameTime } from "../helpers/timeConverter.js";
 import { loadFonts } from "../helpers/fontsLoader";
 import { scoreCalc } from "../helpers/scoreCalculator";
 import { confirm } from "../helpers/confirmBox";
+import { styles } from "../assets/styles";
 
 export default function Board({ route, navigation, leaderBoard, setLeaderBoard }) {
 
@@ -56,7 +57,10 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     setLoading(true);
     const endpoint =
       `https://sugoku2.herokuapp.com/board?difficulty=${route.params.level}`;
-    const response = await fetch(endpoint);
+    const response = await fetch(endpoint)
+      .catch(() => {
+        ToastAndroid.show('Fetch Failed! Please get new board.', 3000)
+      });
     const { board } = await response.json();
     setBoard(board);
     setInput(board);
@@ -78,7 +82,11 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
         "Content-Type": "application/x-www-form-urlencoded",
       },
     };
-    const response = await fetch(endpoint, options);
+    const response = await fetch(endpoint, options)
+      .catch(() => {
+        ToastAndroid.show('Check Failed! Please retry.', 3000)
+        setLoading(false);
+      });
     const { status } = await response.json();
     if (status === "solved") {
       const finishTime = time;
@@ -86,7 +94,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
       const playerName = name;
       finishGame(playerName, route.params.level, finishTime, finalScore);
     } else {
-      ToastAndroid.show("Incorrect answers! Keep trying!", 2000)
+      ToastAndroid.show("Incorrect answers! Keep trying!", 3000)
       setPaused(false);
     }
     setLoading(false);
@@ -104,12 +112,16 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
         "Content-Type": "application/x-www-form-urlencoded",
       },
     };
-    const response = await fetch(endpoint, options);
+    const response = await fetch(endpoint, options)
+      .catch(() => {
+        ToastAndroid.show('Solve Failed! Please retry.', 3000)
+        setLoading(false);
+      });
     const { solution } = await response.json();
     setInput(solution);
-    setGiveUp(true); // DISABLE THIS FOR TESTING PURPOSES
+    // setGiveUp(true); // DISABLE THIS FOR TESTING PURPOSES
     setLoading(false);
-    setTime(0); // DISABLE THIS FOR TESTING PURPOSES
+    // setTime(0); // DISABLE THIS FOR TESTING PURPOSES
   };
   ////////////////////
 
@@ -158,15 +170,16 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
         <ScrollView>
           {(loading && (
             <>
-              <Text style={[styles.text]}></Text>
+              <View style={[styles.topBarLoading]}>
+                <Text style={[styles.text]}>Loading...</Text>
+              </View>
               <View style={styles.loadingBox}>
-                <Text style={[styles.text, styles.loadingText]}>loading</Text>
-                <Text style={[styles.text, styles.loadingText]}>...</Text>
+                <ActivityIndicator size="large" color="lightsteelblue" />
               </View>
             </>
           )) || (
             <View>
-              <View style={[styles.fixToText2]}>
+              <View style={[styles.topBar]}>
                 <Text style={[styles.text]}>Time: {inGameTime(time)}</Text>
                 <Text style={[styles.text]}>Level: {route.params.level}</Text>
               </View>
@@ -219,7 +232,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
           )}
             <>
             {!giveUp && (
-              <View style={styles.fixToText}>
+              <View style={styles.bottomBar}>
                 <>
                   <Button
                     title="🏳 GIVE UP"
@@ -251,7 +264,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
                 </>
               </View>
             )}
-              <View style={styles.fixToText}>
+              <View style={styles.bottomBar}>
                 <Button
                   title="🏠 GO TO HOME"
                   color="forestgreen"
@@ -281,81 +294,3 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#282c34",
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-  text: {
-    color: "white",
-    textAlign: "center",
-  },
-  rowStyle: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    borderWidth: 0,
-    maxHeight: 36,
-  },
-  colStyle: {
-    borderWidth: .5,
-    borderColor: "#000",
-    width: 36,
-    height: 36,
-    fontSize: 24,
-  },
-  rowBorder: {
-    borderTopWidth: 2,
-  },
-  colBorder: {
-    borderLeftWidth: 2,
-  },
-  noBorder: {},
-  lightBg: {
-    backgroundColor: "#282c34",
-  },
-  darkBg: {
-    backgroundColor: "#3d4148",
-  },
-  apiInput: {
-    color: "lightsteelblue",
-    fontFamily: "kashima",
-    fontSize: 36,
-  },
-  userInput: {
-    color: "white",
-    fontFamily: "hiroshima",
-    fontSize: 24,
-  },
-  // emptyCell: {
-  //   // color: "#444",
-  // },
-  fixToText: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignContent: "center",
-    marginTop: 24,
-  },
-  fixToText2: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 6,
-  },
-  loadingBox: {
-    width: 326,
-    height: 326,
-    borderWidth: 2,
-    borderColor: "#888",
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-  },
-  loadingText: {
-    fontSize: 36,
-    margin: 0,
-  },
-});

@@ -35,6 +35,7 @@ export default function App() {
             <Finish
               {...props}
               leaderBoard={leaderBoard}
+              setLeaderBoard={setLeaderBoard}
             />
           )}
         </Stack.Screen>

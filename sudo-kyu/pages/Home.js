@@ -42,8 +42,12 @@ export default function Home({ navigation }) {
     }
   };
 
+  const gotoLeaderBoard = () => {
+    navigation.navigate("Finish");
+  }
+
   return (
-    <KeyboardAvoidingView style={styles.containerHome}>
+    <KeyboardAvoidingView style={styles.container}>
       {fontsReady && (
         <ScrollView>
           <Text style={[styles.text, styles.marTop, styles.title]}>SUDO-KYU</Text>
@@ -69,6 +73,13 @@ export default function Home({ navigation }) {
               title="👽 HARD"
               color="crimson"
               onPress={() => gotoBoard("hard")}
+            />
+          </View>
+          <View style={styles.viewDiv}>
+            <Button
+              title="🏆 SEE LEADERBOARD"
+              color="darkorange"
+              onPress={() => gotoLeaderBoard()}
             />
           </View>
         </ScrollView>

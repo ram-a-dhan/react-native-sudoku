@@ -1,29 +1,26 @@
 import React from "react";
 import {
-  AsyncStorage,
   StyleSheet,
   Text,
   Button,
   View,
   ScrollView,
   KeyboardAvoidingView,
-  Alert,
 } from "react-native";
 import { resultTime } from "../helpers/timeConverter.js";
 
-export default function Home({ navigation, leaderBoard }) {
+export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
+
   const gotoHome = async () => {
-    await AsyncStorage.removeItem("player");
     navigation.navigate("Home");
   };
-  const confirm = (title, message, action) => {
-    Alert.alert(title, message, [
-      { text: "YES", onPress: action },
-      { text: "NO", style: "cancel" },
-    ]);
+
+  const resetLeaderBoard = () => {
+    setLeaderBoard([]);
   };
+
   return (
-    <KeyboardAvoidingView style={styles.containerHome}>
+    <KeyboardAvoidingView style={styles.container}>
       <View>
         {(!leaderBoard &&
           <>
@@ -36,21 +33,37 @@ export default function Home({ navigation, leaderBoard }) {
         ) || (
               <>
                 <Text style={[styles.text, styles.title]}>LEADERBOARD</Text>
-                <View style={styles.fixToText}>
-                  <Text style={[styles.text, styles.textBold]}>Name</Text>
-                  <Text style={[styles.text, styles.textBold]}>Score</Text>
-                  <Text style={[styles.text, styles.textBold]}>Time</Text>
-                  <Text style={[styles.text, styles.textBold]}>Level</Text>
+                <View style={[styles.tableRow, styles.fixToText]}>
+                  <View style={styles.tableCell}>
+                    <Text style={[styles.text, styles.textBold]}>Name</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={[styles.text, styles.textBold]}>Score</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={[styles.text, styles.textBold]}>Time</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={[styles.text, styles.textBold]}>Level</Text>
+                  </View>
                 </View>
-                <ScrollView>
+                <ScrollView contentContainerStyle={styles.tableBody}>
                   {
                     leaderBoard.map((data, idx) => {
                       return(
-                        <View key={idx} style={styles.fixToText}>
-                          <Text style={styles.text, styles.textLeft}>{data.name}</Text>
-                          <Text style={styles.text, styles.textRight}>{Math.trunc(data.score)}</Text>
-                          <Text style={styles.text, styles.textRight}>{resultTime(data.time)}</Text>
-                          <Text style={styles.text, styles.textRight}>{data.diff === 'medium' ? 'med' : data.diff}</Text>
+                        <View key={idx} style={[styles.tableRow, styles.fixToText]}>
+                          <View style={styles.tableCell}>
+                            <Text style={styles.text}>{data.name}</Text>
+                          </View>
+                          <View style={styles.tableCell}>
+                            <Text style={styles.text}>{Math.trunc(data.score)}</Text>
+                          </View>
+                          <View style={styles.tableCell}>
+                            <Text style={styles.text}>{resultTime(data.time)}</Text>
+                          </View>
+                          <View style={styles.tableCell}>
+                            <Text style={styles.text}>{data.diff === 'medium' ? 'med' : data.diff}</Text>
+                          </View>
                         </View>
                       )
                     })
@@ -58,8 +71,9 @@ export default function Home({ navigation, leaderBoard }) {
                 </ScrollView>
               </>
         )}
-        <View style={[styles.marBot, styles.marTop]}>
+        <View style={styles.bottomBar}>
           <Button title="NEW GAME" color="green" onPress={gotoHome} />
+          <Button title="RESET" color="crimson" onPress={resetLeaderBoard} />
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -69,27 +83,13 @@ export default function Home({ navigation, leaderBoard }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "flex-start",
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#282c34",
-  },
-  containerHome: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
     backgroundColor: "#282c34",
   },
   text: {
     color: "white",
     textAlign: "center",
-  },
-  textLeft: {
-    color: "white",
-    textAlign: "left",
-  },
-  textRight: {
-    color: "white",
-    textAlign: "right",
   },
   textBold: {
     fontWeight: "bold",
@@ -173,4 +173,23 @@ const styles = StyleSheet.create({
   marBot: {
     marginBottom: 36,
   },
+  bottomBar: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignContent: "center",
+    marginTop: 24,
+  },
+  tableBody: {
+    flex: 1,
+    alignItems: 'flex-start'
+  },
+  tableRow: {
+    flex: 1,
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+  },
+  tableCell: {
+    flex: 1,
+    alignSelf: 'stretch',
+  }
 });
