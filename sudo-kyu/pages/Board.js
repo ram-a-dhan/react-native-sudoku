@@ -126,8 +126,8 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
   ////////////////////
 
   const handleInput = (text, i, j) => {
-    let newInput = [],
-      temp = [];
+    let newInput = [];
+    let temp = [];
     for (let x = 0; x < input.length; x++) {
       for (let y = 0; y < input[x].length; y++) {
         temp.push(Number(input[x][y]));
@@ -194,7 +194,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
                             styles.colStyle,
                             styles.text,
                             styles.apiInput,
-                            styles.lightBg,
+                            styles.darkBg,
                             i !== 0 && i % 3 === 0 ? styles.rowBorder : styles.noBorder,
                             j !== 0 && j % 3 === 0 ? styles.colBorder : styles.noBorder,
                           ]}
@@ -202,17 +202,17 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
                           maxLength={1}
                           editable={false}
                           defaultValue={col.toString()}
-                        ></TextInput>
-                      );
-                    } else {
-                      return (
-                        <TextInput
+                          ></TextInput>
+                          );
+                        } else {
+                          return (
+                            <TextInput
                           key={j}
                           style={[
                             styles.colStyle,
                             styles.text,
                             styles.userInput,
-                            styles.darkBg,
+                            styles.lightBg,
                             i !== 0 && i % 3 === 0 ? styles.rowBorder : styles.noBorder,
                             j !== 0 && j % 3 === 0 ? styles.colBorder : styles.noBorder,
                           ]}

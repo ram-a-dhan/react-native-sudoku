@@ -6,7 +6,9 @@ import {
   View,
   ScrollView,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from "react-native";
+import { Table, TableWrapper, Row } from "react-native-table-component";
 import { resultTime } from "../helpers/timeConverter.js";
 
 export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
@@ -21,61 +23,63 @@ export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
 
   return (
     <KeyboardAvoidingView style={styles.container}>
-      <View>
+      <ScrollView>
         {(!leaderBoard &&
           <>
-            <Text style={[styles.text, styles.loadingText]}>Loading</Text>
-            <Text style={[styles.text, styles.loadingText]}>...</Text>
-          </>
-        ) || (!leaderBoard.length &&
-          <>
+            <ActivityIndicator size="large" color="lightsteelblue" />
           </>
         ) || (
               <>
                 <Text style={[styles.text, styles.title]}>LEADERBOARD</Text>
-                <View style={[styles.tableRow, styles.fixToText]}>
-                  <View style={styles.tableCell}>
-                    <Text style={[styles.text, styles.textBold]}>Name</Text>
+                {!leaderBoard.length && (
+                  <View style={[{height:380}, {flex:1, justifyContent: 'center', alignItems: 'center'}]}>
+                    <Text style={[styles.text, {fontSize: 24}]}>There's no one here</Text>
                   </View>
-                  <View style={styles.tableCell}>
-                    <Text style={[styles.text, styles.textBold]}>Score</Text>
-                  </View>
-                  <View style={styles.tableCell}>
-                    <Text style={[styles.text, styles.textBold]}>Time</Text>
-                  </View>
-                  <View style={styles.tableCell}>
-                    <Text style={[styles.text, styles.textBold]}>Level</Text>
-                  </View>
-                </View>
-                <ScrollView contentContainerStyle={styles.tableBody}>
-                  {
-                    leaderBoard.map((data, idx) => {
-                      return(
-                        <View key={idx} style={[styles.tableRow, styles.fixToText]}>
-                          <View style={styles.tableCell}>
-                            <Text style={styles.text}>{data.name}</Text>
-                          </View>
-                          <View style={styles.tableCell}>
-                            <Text style={styles.text}>{Math.trunc(data.score)}</Text>
-                          </View>
-                          <View style={styles.tableCell}>
-                            <Text style={styles.text}>{resultTime(data.time)}</Text>
-                          </View>
-                          <View style={styles.tableCell}>
-                            <Text style={styles.text}>{data.diff === 'medium' ? 'med' : data.diff}</Text>
-                          </View>
-                        </View>
-                      )
-                    })
-                  }
-                </ScrollView>
+                ) || (
+                  <>
+                    <Table>
+                      <Row
+                        data={['NAME', 'SCORE', 'TIME', 'LEVEL']}
+                        style={[styles.lightBg, styles.padVert]}
+                        textStyle={styles.text}
+                      />
+                    </Table>
+                    <View style={{height: 360 }}>
+                      <ScrollView>
+                        {
+                          leaderBoard.map((data, idx) => {
+                            return(
+                              <View key={idx} style={[styles.tableRow, styles.padVert, idx%2 && styles.medBg]}>
+                                <View style={styles.tableCell}>
+                                  <Text style={[styles.text, styles.tableText]}>
+                                    {idx+1 === 1 ? '🥇': idx+1 === 2 ? '🥈' : idx+1 === 3 ? '🥉' : ''}
+                                    {data.name}
+                                  </Text>
+                                </View>
+                                <View style={styles.tableCell}>
+                                  <Text style={[styles.text, styles.tableText]}>{Math.trunc(data.score)}</Text>
+                                </View>
+                                <View style={styles.tableCell}>
+                                  <Text style={[styles.text, styles.tableText]}>{resultTime(data.time)}</Text>
+                                </View>
+                                <View style={styles.tableCell}>
+                                  <Text style={[styles.text, styles.tableText]}>{data.diff === 'medium' ? 'med' : data.diff}</Text>
+                                </View>
+                              </View>
+                            )
+                          })
+                        }
+                      </ScrollView>
+                    </View>
+                  </>
+                )}
               </>
         )}
-        <View style={styles.bottomBar}>
-          <Button title="NEW GAME" color="green" onPress={gotoHome} />
-          <Button title="RESET" color="crimson" onPress={resetLeaderBoard} />
+        <View style={[styles.padVert, styles.bottomBar]}>
+          <Button title="🏠 HOME" color="green" onPress={gotoHome} />
+          <Button title="🔄 RESET" color="crimson" onPress={resetLeaderBoard} />
         </View>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -83,89 +87,29 @@ export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    backgroundColor: "#282c34",
+    flexDirection: 'column',
+		justifyContent: 'space-around',
+		alignItems: 'center',
+		backgroundColor: '#282c34',
+	},
+	text: {
+		color: 'white',
+		textAlign: 'center',
+		fontFamily: 'hiroshima',
+		letterSpacing: 2,
   },
-  text: {
-    color: "white",
-    textAlign: "center",
+  tableText: {
+    fontSize: 18,
   },
-  textBold: {
-    fontWeight: "bold",
-  },
-  textSummary: {
-    fontSize: 21,
-  },
-  warning: {
-    color: "crimson",
-    textAlign: "center",
-  },
-  title: {
-    fontSize: 36,
-    margin: 36,
-  },
-  rowStyle: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    borderWidth: 1,
-    borderColor: "#888",
-    maxHeight: 36,
-  },
-  colStyle: {
-    borderWidth: 1,
-    borderColor: "#888",
-    width: 36,
-    height: 36,
-    fontSize: 24,
-  },
-  apiInput: {
-    color: "#61dafb",
-    backgroundColor: "#3d4148",
-  },
-  userInput: {
-    backgroundColor: "#24272e",
-  },
-  emptyCell: {
-    color: "#444",
-  },
-  fixToText: {
+	title: {
+		fontSize: 57,
+		margin: 36,
+		fontFamily: 'kashima',
+	},
+	padVert: {
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingVertical: 24,
-  },
-  fixToText3: {
-    flexDirection: "column",
-    justifyContent: "space-around",
-    paddingVertical: 24,
-  },
-  loadingBox: {
-    width: 326,
-    height: 326,
-    borderWidth: 2,
-    borderColor: "#888",
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-  },
-  loadingText: {
-    fontSize: 36,
-    margin: 0,
-  },
-  // startPage: {
-  //   flexDirection: "column",
-  //   justifyContent: "space-around",
-  //   // paddingVertical: 24,
-  // },
-  nameStyle: {
-    borderWidth: 1,
-    color: "#61dafb",
-    backgroundColor: "#3d4148",
-    borderColor: "#888",
-    fontSize: 24,
-    height: 36,
+    paddingVertical: 18,
   },
   marTop: {
     marginTop: 36,
@@ -174,14 +118,15 @@ const styles = StyleSheet.create({
     marginBottom: 36,
   },
   bottomBar: {
+    flex: 1,
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignContent: "center",
-    marginTop: 24,
+    alignItems: "flex-end",
   },
   tableBody: {
     flex: 1,
-    alignItems: 'flex-start'
+    alignItems: 'flex-start',
   },
   tableRow: {
     flex: 1,
@@ -191,5 +136,12 @@ const styles = StyleSheet.create({
   tableCell: {
     flex: 1,
     alignSelf: 'stretch',
-  }
+    height:24,
+  },
+  lightBg: {
+    backgroundColor: "#3d4148",
+  },
+  medBg: {
+    backgroundColor: '#33373E',
+  },
 });

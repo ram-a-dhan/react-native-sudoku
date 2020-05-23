@@ -71,10 +71,10 @@ export const styles = StyleSheet.create({
   },
   noBorder: {},
   lightBg: {
-    backgroundColor: "#282c34",
+    backgroundColor: "#3d4148",
   },
   darkBg: {
-    backgroundColor: "#3d4148",
+    backgroundColor: "#282c34",
   },
   apiInput: {
     color: "lightsteelblue",
