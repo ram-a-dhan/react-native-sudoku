@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
 } from "react-native";
-import { Table, TableWrapper, Row } from "react-native-table-component";
 import { resultTime } from "../helpers/timeConverter.js";
 
 export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
@@ -32,19 +31,27 @@ export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
               <>
                 <Text style={[styles.text, styles.title]}>LEADERBOARD</Text>
                 {!leaderBoard.length && (
-                  <View style={[{height:380}, {flex:1, justifyContent: 'center', alignItems: 'center'}]}>
-                    <Text style={[styles.text, {fontSize: 24}]}>There's no one here</Text>
+                  <View style={[{height:416}, {flex:1, justifyContent: 'center', alignItems: 'center'}]}>
+                    <Text style={[styles.text, {fontSize: 18}]}>There's no one here...</Text>
+                    <Text style={[styles.text, {fontSize: 18, marginBottom:78}]}>Be the first!</Text>
                   </View>
                 ) || (
                   <>
-                    <Table>
-                      <Row
-                        data={['NAME', 'SCORE', 'TIME', 'LEVEL']}
-                        style={[styles.lightBg, styles.padVert]}
-                        textStyle={styles.text}
-                      />
-                    </Table>
-                    <View style={{height: 360 }}>
+                    <View style={[styles.tableRow, styles.padVert, styles.lightBg]}>
+                      <View style={styles.tableCell}>
+                        <Text style={[styles.text, styles.tableText]}>Name</Text>
+                      </View>
+                      <View style={styles.tableCell}>
+                        <Text style={[styles.text, styles.tableText]}>Score</Text>
+                      </View>
+                      <View style={styles.tableCell}>
+                        <Text style={[styles.text, styles.tableText]}>Time</Text>
+                      </View>
+                      <View style={styles.tableCell}>
+                        <Text style={[styles.text, styles.tableText]}>Level</Text>
+                      </View>
+                    </View>
+                    <View style={{height: 356 }}>
                       <ScrollView>
                         {
                           leaderBoard.map((data, idx) => {
@@ -76,8 +83,8 @@ export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
               </>
         )}
         <View style={[styles.padVert, styles.bottomBar]}>
-          <Button title="🏠 HOME" color="green" onPress={gotoHome} />
-          <Button title="🔄 RESET" color="crimson" onPress={resetLeaderBoard} />
+          <Button title="🏠 HOME" color="#52545C" onPress={() => gotoHome()} />
+          <Button title="🔄 RESET" color="#52545C" onPress={() => resetLeaderBoard()} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

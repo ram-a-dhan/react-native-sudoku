@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
 	},
 	nameInput: {
 		borderWidth: 0,
-		color: '#61dafb',
+		color: 'white',
 		borderRadius: 3,
 		backgroundColor: '#3d4148',
 		fontSize: 24,

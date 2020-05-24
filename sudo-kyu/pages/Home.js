@@ -61,24 +61,24 @@ export default function Home({ navigation }) {
           <View style={[styles.viewDiv, styles.marBot]}>
             <Button
               title="👨 EASY"
-              color="forestgreen"
+              color="#52545C"
               onPress={() => gotoBoard("easy")}
             />
             <Button
               title="🤖 MEDIUM"
-              color="dodgerblue"
+              color="#52545C"
               onPress={() => gotoBoard("medium")}
             />
             <Button
-              title="👽 HARD"
-              color="crimson"
+              title="👾 HARD"
+              color="#52545C"
               onPress={() => gotoBoard("hard")}
             />
           </View>
           <View style={styles.viewDiv}>
             <Button
               title="🏆 SEE LEADERBOARD"
-              color="darkorange"
+              color="#52545C"
               onPress={() => gotoLeaderBoard()}
             />
           </View>

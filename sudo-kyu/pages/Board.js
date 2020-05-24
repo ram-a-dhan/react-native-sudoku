@@ -236,7 +236,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
                 <>
                   <Button
                     title="🏳 GIVE UP"
-                    color="grey"
+                    color="#52545C"
                     onPress={() =>
                       confirm(
                         "GIVING UP?",
@@ -247,17 +247,17 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
                   />
                   <Button
                     title="🔍 CHECK"
-                    color="dodgerblue"
-                    onPress={checkSugoku}
+                    color="#52545C"
+                    onPress={() => checkSugoku()}
                   />
                   <Button
                     title="🔄 RESTART"
-                    color="darkorange"
+                    color="#52545C"
                     onPress={() =>
                       confirm(
                         "RESET BOARD?",
                         "Clear your input and start over?",
-                        () => resetSugoku()
+                        resetSugoku()
                       )
                     }
                   />
@@ -267,7 +267,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
               <View style={styles.bottomBar}>
                 <Button
                   title="🏠 GO TO HOME"
-                  color="forestgreen"
+                  color="#52545C"
                   onPress={() =>
                     confirm(
                       "BACK TO HOME?",
@@ -278,7 +278,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
                 />
                 <Button
                   title="🌟 NEW BOARD"
-                  color="crimson"
+                  color="#52545C"
                   onPress={() =>
                     confirm(
                       "PLAY NEW BOARD?",
