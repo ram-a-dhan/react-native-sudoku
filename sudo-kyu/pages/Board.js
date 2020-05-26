@@ -16,7 +16,7 @@ import {
   BackHandler
 } from "react-native";
 import { encodeParams } from "../helpers/encodeSugoku";
-import { useInterval } from "../helpers/stopwatch.js";
+import { useInterval } from "../hooks/stopwatch.js";
 import { inGameTime } from "../helpers/timeConverter.js";
 import { loadFonts } from "../helpers/fontsLoader";
 import { scoreCalc } from "../helpers/scoreCalculator";
@@ -62,7 +62,8 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     const endpoint =
       `https://sugoku2.herokuapp.com/board?difficulty=${route.params.level}`;
     const response = await fetch(endpoint)
-      .catch(() => {
+      .catch(err => {
+        console.warn(err);
         ToastAndroid.show('Fetch Failed! Please check your internet connection.', 3000)
       });
     const { board } = await response.json();
@@ -87,7 +88,8 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
       },
     };
     const response = await fetch(endpoint, options)
-      .catch(() => {
+      .catch(err => {
+        console.warn(err);
         ToastAndroid.show('Check Failed! Please check your internet connection.', 3000)
         setLoading(false);
       });
@@ -117,15 +119,16 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
       },
     };
     const response = await fetch(endpoint, options)
-      .catch(() => {
+      .catch(err => {
+        console.warn(err);
         ToastAndroid.show('Solve Failed! Please check your internet connection.', 3000)
         setLoading(false);
       });
     const { solution } = await response.json();
     setInput(solution);
-    // setGiveUp(true); // DISABLE THIS FOR TESTING PURPOSES
+    setGiveUp(true); // DISABLE THIS FOR TESTING PURPOSES
     setLoading(false);
-    // setTime(0); // DISABLE THIS FOR TESTING PURPOSES
+    setTime(0); // DISABLE THIS FOR TESTING PURPOSES
   };
   ////////////////////
 
