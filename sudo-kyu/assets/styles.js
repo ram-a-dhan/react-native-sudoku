@@ -45,7 +45,7 @@ export const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     alignContent: "center",
     alignItems: "flex-end",
-    marginTop:24
+    marginTop:24,
   },
 	////////////////
 
@@ -133,16 +133,14 @@ export const styles = StyleSheet.create({
 		fontFamily: 'kashima',
   },
   emptyViewDiv: {
-    height:416,
+    height:360,
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
-  },
-  emptyFont: {
-    fontSize: 18,
+    alignItems: 'center',
+    backgroundColor: "black"
   },
   emptyMarBot: {
-    marginBottom: 78,
+    marginBottom: 24,
   },
   tableText: {
     fontSize: 18,

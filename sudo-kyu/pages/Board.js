@@ -13,6 +13,7 @@ import {
   AsyncStorage,
   ToastAndroid,
   ActivityIndicator,
+  BackHandler
 } from "react-native";
 import { encodeParams } from "../helpers/encodeSugoku";
 import { useInterval } from "../helpers/stopwatch.js";
@@ -21,8 +22,10 @@ import { loadFonts } from "../helpers/fontsLoader";
 import { scoreCalc } from "../helpers/scoreCalculator";
 import { confirm } from "../helpers/confirmBox";
 import { styles } from "../assets/styles";
+import { backMinimize } from "../hooks/backMinimize";
 
 export default function Board({ route, navigation, leaderBoard, setLeaderBoard }) {
+  backMinimize();
 
   //// STATE INITIALISATIONS ////
   const [name, setName] = useState("");
@@ -36,6 +39,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
   ///////////////////////////////
 
   useEffect(() => {
+    // backButton();
     getName();
     loadFonts()
       .then(() => setFontsReady(true));
@@ -257,7 +261,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
                       confirm(
                         "RESET BOARD?",
                         "Clear your input and start over?",
-                        resetSugoku()
+                        () => resetSugoku()
                       )
                     }
                   />

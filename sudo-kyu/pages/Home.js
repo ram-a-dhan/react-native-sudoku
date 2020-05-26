@@ -11,11 +11,14 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Alert,
+  BackHandler,
 } from "react-native";
 import { styles } from "../assets/styles";
 import { loadFonts } from "../helpers/fontsLoader";
+import { backMinimize } from "../hooks/backMinimize";
 
 export default function Home({ navigation }) {
+  backMinimize();
 
   const [name, setName] = useState("");
   const [fontsReady, setFontsReady] = useState(false);

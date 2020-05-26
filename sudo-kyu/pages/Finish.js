@@ -6,11 +6,14 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   ActivityIndicator,
+  BackHandler
 } from "react-native";
 import { resultTime } from "../helpers/timeConverter.js";
 import { styles } from "../assets/styles";
+import { backMinimize } from "../hooks/backMinimize";
 
 export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
+  backMinimize();
 
   const gotoHome = async () => {
     navigation.navigate("Home");
@@ -32,8 +35,8 @@ export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
             <Text style={[styles.text, styles.finishTitle]}>LEADERBOARD</Text>
             {!leaderBoard.length && (
               <View style={styles.emptyViewDiv}>
-                <Text style={[styles.text, styles.emptyFont]}>THERE'S NO ONE HERE...</Text>
-                <Text style={[styles.text, styles.emptyFont, styles.emptyMarBot]}>BE THE FIRST!</Text>
+                <Text style={[styles.text]}>THERE'S NO ONE HERE...</Text>
+                <Text style={[styles.text, styles.emptyMarBot]}>BE THE FIRST!</Text>
               </View>
             ) || (
               <>
