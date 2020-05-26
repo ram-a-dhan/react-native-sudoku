@@ -59,7 +59,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
       `https://sugoku2.herokuapp.com/board?difficulty=${route.params.level}`;
     const response = await fetch(endpoint)
       .catch(() => {
-        ToastAndroid.show('Fetch Failed! Please get new board.', 3000)
+        ToastAndroid.show('Fetch Failed! Please check your internet connection.', 3000)
       });
     const { board } = await response.json();
     setBoard(board);
@@ -84,7 +84,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     };
     const response = await fetch(endpoint, options)
       .catch(() => {
-        ToastAndroid.show('Check Failed! Please retry.', 3000)
+        ToastAndroid.show('Check Failed! Please check your internet connection.', 3000)
         setLoading(false);
       });
     const { status } = await response.json();
@@ -114,7 +114,7 @@ export default function Board({ route, navigation, leaderBoard, setLeaderBoard }
     };
     const response = await fetch(endpoint, options)
       .catch(() => {
-        ToastAndroid.show('Solve Failed! Please retry.', 3000)
+        ToastAndroid.show('Solve Failed! Please check your internet connection.', 3000)
         setLoading(false);
       });
     const { solution } = await response.json();

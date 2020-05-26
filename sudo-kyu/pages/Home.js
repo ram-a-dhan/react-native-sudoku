@@ -50,7 +50,7 @@ export default function Home({ navigation }) {
     <KeyboardAvoidingView style={styles.container}>
       {fontsReady && (
         <ScrollView>
-          <Text style={[styles.text, styles.marTop, styles.title]}>SUDO-KYU</Text>
+          <Text style={[styles.text, styles.homeMarTop, styles.title]}>SUDO-KYU</Text>
           <Text style={[styles.text, styles.marBot]}>ENTER YOUR NAME:</Text>
           <TextInput
             style={[styles.nameInput, styles.text, styles.marBot]}

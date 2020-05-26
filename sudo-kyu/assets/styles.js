@@ -19,6 +19,34 @@ export const styles = StyleSheet.create({
 		margin: 36,
 		fontFamily: 'kashima',
 	},
+	marTop: {
+		marginTop: 36,
+	},
+	marBot: {
+		marginBottom: 36,
+	},
+  lightBg: {
+    backgroundColor: "#3d4148",
+  },
+  medBg: {
+    backgroundColor: '#33373E',
+  },
+  darkBg: {
+    backgroundColor: "#282c34",
+  },
+  padVert: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 18,
+  },
+  bottomBar: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignContent: "center",
+    alignItems: "flex-end",
+    marginTop:24
+  },
 	////////////////
 
 	//// HOME ////
@@ -38,11 +66,8 @@ export const styles = StyleSheet.create({
 		fontSize: 24,
 		height: 36,
 	},
-	marTop: {
+	homeMarTop: {
 		marginTop: 126,
-	},
-	marBot: {
-		marginBottom: 36,
 	},
 	//////////////
 
@@ -70,12 +95,6 @@ export const styles = StyleSheet.create({
     borderLeftWidth: 2,
   },
   noBorder: {},
-  lightBg: {
-    backgroundColor: "#3d4148",
-  },
-  darkBg: {
-    backgroundColor: "#282c34",
-  },
   apiInput: {
     color: "lightsteelblue",
     fontFamily: "kashima",
@@ -85,12 +104,6 @@ export const styles = StyleSheet.create({
     color: "white",
     fontFamily: "hiroshima",
     fontSize: 24,
-  },
-  bottomBar: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignContent: "center",
-    marginTop: 24,
   },
   topBar: {
     flexDirection: "row",
@@ -111,9 +124,41 @@ export const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
   },
-  loadingText: {
-    fontSize: 36,
-    margin: 0,
+  ///////////////
+
+  //// FINISH ////
+  finishTitle: {
+    fontSize: 57,
+		margin: 36,
+		fontFamily: 'kashima',
   },
-	///////////////
+  emptyViewDiv: {
+    height:416,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  emptyFont: {
+    fontSize: 18,
+  },
+  emptyMarBot: {
+    marginBottom: 78,
+  },
+  tableText: {
+    fontSize: 18,
+  },
+  tableBody: {
+    height: 300
+  },
+  tableRow: {
+    flex: 1,
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+  },
+  tableCell: {
+    flex: 1,
+    alignSelf: 'stretch',
+    height:24,
+  },
+  ////////////////
 });
