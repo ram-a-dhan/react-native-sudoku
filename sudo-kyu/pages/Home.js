@@ -11,7 +11,6 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Alert,
-  BackHandler,
 } from "react-native";
 import { styles } from "../assets/styles";
 import { loadFonts } from "../helpers/fontsLoader";

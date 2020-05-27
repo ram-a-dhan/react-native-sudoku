@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Text,
   Button,
@@ -6,14 +6,21 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   ActivityIndicator,
-  BackHandler
 } from "react-native";
+import { insertionSort } from "../helpers/insertionSort";
 import { resultTime } from "../helpers/timeConverter.js";
 import { styles } from "../assets/styles";
 import { backMinimize } from "../hooks/backMinimize";
 
 export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
   backMinimize();
+
+  useEffect(() => {
+    if (leaderBoard && leaderBoard.length > 1) {
+      setLeaderBoard(insertionSort(leaderBoard));
+      if (leaderBoard.length > 10) setLeaderBoard(leaderBoard.slice(0, 10));
+    }
+  }, [])
 
   const gotoHome = async () => {
     navigation.navigate("Home");
@@ -67,13 +74,19 @@ export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
                               </Text>
                             </View>
                             <View style={styles.tableCell}>
-                              <Text style={[styles.text, styles.tableText]}>{Math.trunc(data.score)}</Text>
+                              <Text style={[styles.text, styles.tableText]}>
+                                {Math.trunc(data.score)}
+                              </Text>
                             </View>
                             <View style={styles.tableCell}>
-                              <Text style={[styles.text, styles.tableText]}>{resultTime(data.time)}</Text>
+                              <Text style={[styles.text, styles.tableText]}>
+                                {resultTime(data.time)}
+                              </Text>
                             </View>
                             <View style={styles.tableCell}>
-                              <Text style={[styles.text, styles.tableText]}>{data.diff === 'medium' ? 'med' : data.diff}</Text>
+                              <Text style={[styles.text, styles.tableText]}>
+                                {data.diff === 'medium' ? 'med' : data.diff}
+                              </Text>
                             </View>
                           </View>
                         )

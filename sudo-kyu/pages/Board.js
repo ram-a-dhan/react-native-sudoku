@@ -13,7 +13,6 @@ import {
   AsyncStorage,
   ToastAndroid,
   ActivityIndicator,
-  BackHandler
 } from "react-native";
 import { encodeParams } from "../helpers/encodeSugoku";
 import { useInterval } from "../hooks/stopwatch.js";
