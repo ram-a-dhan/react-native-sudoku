@@ -10,6 +10,7 @@ import {
 import { insertionSort } from "../helpers/insertionSort";
 import { resultTime } from "../helpers/timeConverter.js";
 import { styles } from "../assets/styles";
+import { confirm } from "../helpers/confirmBox";
 import { backMinimize } from "../hooks/backMinimize";
 
 export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
@@ -99,8 +100,21 @@ export default function Home({ navigation, leaderBoard, setLeaderBoard }) {
           </>
         )}
         <View style={[styles.padVert, styles.bottomBar]}>
-          <Button title="🏠 HOME" color="#52545C" onPress={() => gotoHome()} />
-          <Button title="🔄 RESET" color="#52545C" onPress={() => resetLeaderBoard()} />
+          <Button
+            title="🏠 HOME"
+            color="#52545C"
+            onPress={() => gotoHome()}
+          />
+          <Button
+            title="🔄 RESET"
+            color="#52545C"
+            onPress={() =>
+              confirm(
+                "RESET LEADERBOARD?",
+                "Erase all leaderboard entries?",
+                () => resetLeaderBoard()
+              )}
+          />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
