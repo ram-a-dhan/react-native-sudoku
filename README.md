@@ -1,1 +1,1 @@
-# sugoku
+# React Native Sudoku: Sudo-Kyu
