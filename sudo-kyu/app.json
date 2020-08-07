@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "sudo-kyu",
+    "name": "Sudo-Kyu",
     "slug": "sudo-kyu",
     "platforms": [
       "ios",
@@ -22,7 +22,13 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ram-a-dhan.sudo-kyu",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "com.yourcompany.yourappname",
+      "versionCode": 1
     }
   }
 }
